@@ -3,9 +3,7 @@ name: "Build & Release APK"
 on:
   push:
     branches:
-      - news-app-with-auth
-      - note_app_api
-      - note_app
+      - master
 
 jobs:
   build:
