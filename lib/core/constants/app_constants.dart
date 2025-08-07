@@ -1,5 +1,5 @@
 
 class AppConstants {
-  static const String appName = 'news';
+  static const String appName = 'Note';
 
 }

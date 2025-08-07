@@ -6,6 +6,9 @@ import '../../features/auth/login/ui/screens/login_screen.dart';
 
 import '../../features/auth/signup/ui/screens/sign_up_screen.dart';
 import '../../features/home/data/models/card_model.dart';
+import '../../features/home/data/models/notes_model.dart';
+import '../../features/home/ui/views/add_note.dart';
+import '../../features/home/ui/views/edit_note.dart';
 import '../../features/home/ui/views/home_screen.dart';
 import '../../features/home/ui/views/widgets/custom_grid_view.dart';
 import '../../features/onboarding/ui/views/onboarding_screen.dart';
@@ -22,6 +25,11 @@ class AppRouter {
         return _createRoute(LoginScreen());
       case Routes.signupsScreen:
         return _createRoute(SignUpScreen());
+      case Routes.addNote:
+        return _createRoute(AddNote());
+      case Routes.editNoteScreen:
+        final note = arguments as NotesModel;
+        return _createRoute(EditNoteScreen(note: note,));
 
       default:
         return MaterialPageRoute(

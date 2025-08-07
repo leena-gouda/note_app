@@ -42,7 +42,7 @@ class CustomTextFormField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 38.h,
+      //height: 38.h,
       child: TextFormField(
         controller: controller,
         obscureText: obscureText,
@@ -64,7 +64,7 @@ class CustomTextFormField extends StatelessWidget {
         decoration: InputDecoration(
           filled: true,
           fillColor: Colors.white,
-          contentPadding: EdgeInsetsDirectional.only(start: 20.w),
+          //contentPadding: EdgeInsetsDirectional.only(start: 20.w),
           hintText: hintText,
           hintStyle:
           hintStyle ??

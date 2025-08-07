@@ -1,9 +1,9 @@
-class NoteRustAddModel {
+class NoteReqAddModel {
   final String title;
   final String content;
   final String? userId;
 
-  NoteRustAddModel({
+  NoteReqAddModel({
     required this.title,
     required this.content,
     this.userId,

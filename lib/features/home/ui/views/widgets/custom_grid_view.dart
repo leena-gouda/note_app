@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../data/models/card_model.dart';
+import '../home_screen.dart';
 import 'custom_card.dart';
 
 class CustomGridView extends StatelessWidget {
@@ -20,7 +21,23 @@ class CustomGridView extends StatelessWidget {
         mainAxisSpacing: 4.h,
       ),
       itemCount: cardList.length,
-      itemBuilder:(BuildContext context, int index) =>CustomCard(cardModel: cardList[index]),
+      itemBuilder:(BuildContext context, int index) =>
+          CustomCard(
+            cardModel: cardList[index],
+            onTap: (){
+              switch (index) {
+                case 0:
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => HomeScreen()));
+                  break;
+                case 1:
+                  break;
+                default:
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("${cardList[index].title} clicked (not implemented)")),
+                  );
+              }
+            },
+          ),
     );
   }
 }

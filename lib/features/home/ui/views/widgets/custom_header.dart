@@ -1,49 +1,66 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:intl/intl.dart';
+import 'package:note_app/core/utils/extensions/navigation_extensions.dart';
 
+import '../../../../../core/routing/routes.dart';
 import '../../../../../core/theme/app_colors.dart';
+import '../../cubit/note_cubit.dart';
 
-class CustomHeader extends StatelessWidget {
-  const CustomHeader({super.key});
-  String _formatDate(DateTime date) {
-    final monthNames = [
-      "January", "February", "March", "April", "May", "June",
-      "July", "August", "September", "October", "November", "December"
-    ];
+class CustomAppbar extends StatelessWidget {
+  const CustomAppbar({super.key});
 
-    return "${date.day} ${monthNames[date.month - 1]}, ${date.year}";
-  }
   @override
   Widget build(BuildContext context) {
+    DateTime now = DateTime.now();
+    String formattedDate = DateFormat('d MMMM, y').format(now);
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              _formatDate(DateTime.now()),
-              style: TextStyle(
-                fontSize: 13.sp,
-                fontWeight: FontWeight.w500,
-              ),
+            Row(
+              children: [
+                Text(
+                  "${context.read<NoteCubit>().username} - ",
+                  style: TextStyle(
+                    fontSize: 16.sp,
+                    fontWeight: FontWeight.bold,
+                    color: AppColor.primaryColor,
+                  ),
+                ),
+                Text(
+                  formattedDate,
+                  style: TextStyle(
+                    fontSize: 12.sp,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
             ),
             Text(
               "Notes",
-              style: TextStyle(
-                fontSize: 26.sp,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 26.sp, fontWeight: FontWeight.bold),
             ),
           ],
         ),
-        IconButton(
-          onPressed: () {},
+        IconButton.outlined(
+          style: ButtonStyle(
+            padding: WidgetStatePropertyAll(EdgeInsets.all(1)),
+            side: MaterialStateProperty.all(
+              BorderSide(color: AppColor.primaryColor, width: 1.5.w),
+            ),
+          ),
+          onPressed: () {
+            context.pushReplacementNamed(Routes.loginScreen);
+          },
           icon: Icon(
-            CupertinoIcons.ellipsis_circle,
+            Icons.more_horiz_outlined,
             color: AppColor.primaryColor,
-            size: 35.sp,
+            size: 25.sp,
           ),
         ),
       ],

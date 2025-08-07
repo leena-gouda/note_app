@@ -1,4 +1,5 @@
 
+import 'package:dartz/dartz.dart';
 import 'package:dio/src/response.dart';
 
 import '../../../../core/constants/endpoint_constants.dart';
@@ -11,8 +12,8 @@ class NoteRepoImpl implements NoteRepo {
   final dio = DioClient();
 
   @override
-  NotesModel getNoteById(String noteId) {
-    final response = dio.get(
+  Future<NotesModel> getNoteById(String noteId) async {
+    final response = await dio.get(
       EndpointConstants.getOnlyNote,
       queryParameters: {'noteId': noteId},
     );
@@ -23,30 +24,57 @@ class NoteRepoImpl implements NoteRepo {
   }
 
   @override
-  addNote(NoteRustAddModel note) {
-    final response = dio.post(EndpointConstants.addNote, data: note);
+  Future<String> addNote(NoteReqAddModel note) async {
+    final response = await dio.post(EndpointConstants.addNote, queryParameters: note.toJson());
+    if (response.data['status'] == 'success') {
+      return response.data['message'] ?? 'Note added successfully';
+    }
     print(response);
+    throw Exception(response.data['message'] ?? 'Failed to add note');
   }
 
+
   @override
-  Future<List<NotesModel>> getAllNotes(String userId) async {
+  Future<Either<String, List<NotesModel>>> getAllNotes(String userId) async {
     final response = await dio.get(
       EndpointConstants.getAllNotes,
       queryParameters: {'users_id': userId},
     );
-    if (response.statusCode != 200) {
-      throw Exception('Failed to load notes');
-    }
-    print(response.data); // لمراجعة الشكل
-    print(response.data['data'].runtimeType); // هل فعلاً List؟
-    print(response.data['data'][0].runtimeType); // هل فعلاً Map؟
 
     if (response.data['status'] == 'success' && response.data['data'] is List) {
-      return (response.data['data'] as List)
+      return right((response.data['data'] as List)
           .map((e) => NotesModel.fromJson(e))
-          .toList();
+          .toList());
     } else {
-      return [];
+      return left(response.data['message'] ?? 'Failed to load notes');
     }
   }
-}
+  @override
+  Future<String> deleteNote(String noteId) async {
+    final response = await dio.post(
+      EndpointConstants.deleteNote, data: {'note_id': noteId},
+    );
+
+    if (response.data['status'] == 'success') {
+      return response.data['message'] ?? 'Note deleted successfully';
+    } else {
+      throw Exception(response.data['message'] ?? 'Failed to delete note');
+    }
+  }
+
+  @override
+  Future<String> editeNote(String noteId, String title, String content) async{
+    final response =await dio.post(
+      EndpointConstants.editNote,
+      data: {
+        'note_id': noteId,
+        'title': title,
+        'content': content,
+      },
+    );
+    if (response.data['status'] == 'success') {
+      return response.data['message'] ?? 'Note deleted successfully';
+    } else {
+      throw response;
+    }
+  }}

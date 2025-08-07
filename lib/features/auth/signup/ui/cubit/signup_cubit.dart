@@ -2,17 +2,19 @@ import 'package:bloc/bloc.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 
+import '../../../login/data/models/user_model.dart';
+import '../../data/repos/signup_repo.dart';
+
 part 'signup_state.dart';
 
 class SignupCubit extends Cubit<SignUpState> {
-  SignupCubit() : super(SignUpInitial());
+  final SignUpRepo signUpRepo;
 
-  final FirebaseAuth auth = FirebaseAuth.instance;
+  SignupCubit(this.signUpRepo) : super(SignUpInitial());
 
+  final TextEditingController usernameController = TextEditingController();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
-  final TextEditingController passwordConfirmController =
-  TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
   bool obscureText = true;
@@ -32,25 +34,13 @@ class SignupCubit extends Cubit<SignUpState> {
     if (formKey.currentState?.validate() == true) {
       emit(SignUpLoading());
 
-      if (passwordController.text != passwordConfirmController.text) {
-        emit(SignUpError(message: 'Passwords do not match'));
-        print('Passwords do not match');
-        return;
-      }
-
       try {
-        await auth.createUserWithEmailAndPassword(
-          email: emailController.text,
-          password: passwordController.text,
+        final result = await signUpRepo.signUp(
+          usernameController.text,
+          emailController.text,
+          passwordController.text,
         );
-        emit(SignUpSuccess());
-      } on FirebaseAuthException catch (e) {
-        if (e.code == 'weak-password') {
-          print('The password provided is too weak.');
-        } else if (e.code == 'email-already-in-use') {
-          print('The account already exists for that email.');
-        }
-        emit(SignUpError(message: e.code));
+        emit(SignUpSuccess(user: result));
       } catch (e) {
         emit(SignUpError(message: e.toString()));
         print(e);

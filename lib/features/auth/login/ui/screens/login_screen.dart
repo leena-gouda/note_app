@@ -11,6 +11,7 @@ import '../../../../../core/widgets/custom_button.dart';
 import '../../../../../core/widgets/custom_loading_app.dart';
 import '../../../../../core/widgets/custom_text_auth.dart';
 import '../../../../../core/widgets/custom_text_form_field.dart';
+import '../../data/repos/login_repo.dart';
 import '../cubit/login_cubit.dart';
 
 class LoginScreen extends StatelessWidget {
@@ -19,7 +20,7 @@ class LoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => LoginCubit(),
+      create: (context) => LoginCubit(LoginRepo()),
       child: Scaffold(
         appBar: AppBar(toolbarHeight: 0),
         body: BlocConsumer<LoginCubit, LoginState>(
@@ -32,7 +33,7 @@ class LoginScreen extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    'تم التسجيل بنجاح!',
+                    'You are Successfully logged in ${state.userModel?.username}',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,

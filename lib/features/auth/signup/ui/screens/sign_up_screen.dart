@@ -11,6 +11,7 @@ import '../../../../../core/widgets/custom_button.dart';
 import '../../../../../core/widgets/custom_loading_app.dart';
 import '../../../../../core/widgets/custom_text_auth.dart';
 import '../../../../../core/widgets/custom_text_form_field.dart';
+import '../../data/repos/signup_repo.dart';
 import '../cubit/signup_cubit.dart';
 
 class SignUpScreen extends StatelessWidget {
@@ -19,7 +20,7 @@ class SignUpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => SignupCubit(),
+      create: (context) => SignupCubit(SignUpRepo()),
       child: Scaffold(
         appBar: AppBar(toolbarHeight: 0),
         body: BlocConsumer<SignupCubit, SignUpState>(
@@ -32,7 +33,7 @@ class SignUpScreen extends StatelessWidget {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
                   content: Text(
-                    'تم التسجيل بنجاح!',
+                    'You successfully created an account ${state.user?.username}',
                     style: TextStyle(
                       color: Colors.white,
                       fontWeight: FontWeight.w600,
@@ -95,10 +96,24 @@ class SignUpScreen extends StatelessWidget {
                         CustomTextAuth(text: "Create an\naccount"),
                         const SizedBox(height: 36),
                         CustomTextFormField(
-                          hintText: "Username or Email",
+                          hintText: "Username",
+                          controller: signupCubit.usernameController,
+                          keyboardType: TextInputType.text,
+                          prefixIcon: Icon(Icons.person),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter your username or email';
+                            }
+
+                            return null;
+                          },
+                        ),
+                        const SizedBox(height: 32),
+                        CustomTextFormField(
+                          hintText: "Email",
                           controller: signupCubit.emailController,
                           keyboardType: TextInputType.emailAddress,
-                          prefixIcon: Icon(Icons.person),
+                          prefixIcon: Icon(Icons.email_outlined),
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your username or email';
@@ -128,31 +143,6 @@ class SignUpScreen extends StatelessWidget {
                             },
                             icon: Icon(
                               signupCubit.obscureText == true
-                                  ? CupertinoIcons.eye_fill
-                                  : CupertinoIcons.eye_slash,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                        CustomTextFormField(
-                          obscureText: signupCubit.obscureText2,
-                          hintText: "ConfirmPassword",
-                          controller: signupCubit.passwordConfirmController,
-                          keyboardType: TextInputType.emailAddress,
-                          prefixIcon: Icon(CupertinoIcons.lock_fill),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter your password';
-                            }
-                            return null;
-                          },
-                          suffixIcon: IconButton(
-                            onPressed: () {
-                              signupCubit.toggleObscureText2();
-                            },
-                            icon: Icon(
-                              signupCubit.obscureText2 == true
                                   ? CupertinoIcons.eye_fill
                                   : CupertinoIcons.eye_slash,
                               color: Colors.black,
