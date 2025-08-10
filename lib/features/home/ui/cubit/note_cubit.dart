@@ -1,3 +1,4 @@
+import 'package:dartz/dartz.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:meta/meta.dart';
@@ -34,22 +35,46 @@ class NoteCubit extends Cubit<NoteState> {
   List<TextStyleSelection> textStyles = [];
   FontWeight defaultWeight = FontWeight.normal;
 
+
   String? userId;
   String? username;
   String? email;
 
+  // void searchNotes(String query) {
+  //   if (query.isEmpty) {
+  //     emit(NoteSuccess(notesList)); // Show all notes if query is empty
+  //     return;
+  //   }
+  //
+  //   final filteredNotes = notesList.where((note) {
+  //     return note.title!.toLowerCase().contains(query.toLowerCase()) ||
+  //         note.content!.toLowerCase().contains(query.toLowerCase());
+  //   }).toList();
+  //
+  //   emit(NoteSuccess(filteredNotes));
+  // }
+
   void searchNotes(String query) {
     if (query.isEmpty) {
-      emit(NoteSuccess(notesList)); // Show all notes if query is empty
+      emit(NoteSuccess(notesList));
       return;
     }
 
-    final filteredNotes = notesList.where((note) {
-      return note.title!.toLowerCase().contains(query.toLowerCase()) ||
-          note.content!.toLowerCase().contains(query.toLowerCase());
-    }).toList();
+    emit(NoteLoading());
+    try {
+      final results = notesList.where((note) =>
+      note.title!.toLowerCase().contains(query.toLowerCase()) ||
+          note.content!.toLowerCase().contains(query.toLowerCase())
+      ).toList();
+      emit(NoteSuccess(results, isSearchResult: true));
+    } catch (e) {
+      emit(NoteError(e.toString()));
+    }
+  }
 
-    emit(NoteSuccess(filteredNotes));
+  // Add this method
+  void clearSearch() {
+    emit(NoteSuccess(notesList));
   }
 
   void getUserData() async {
@@ -110,6 +135,7 @@ class NoteCubit extends Cubit<NoteState> {
 
 
   }
+
   void deleteNote(String noteId) async {
     emit(NoteLoading());
     try {
@@ -119,6 +145,59 @@ class NoteCubit extends Cubit<NoteState> {
     } catch (e) {
       emit(NoteError(e.toString()));
       print(e);
+    }
+  }
+
+  Future<void> restoreNote(String noteId) async {
+    emit(NoteLoading());
+    try {
+      await noteRepo.restoreNote(noteId);
+
+      final updatedNotes = await noteRepo.getAllNotes(userId.toString());
+
+      emit(NoteSuccess(updatedNotes as List<NotesModel>));
+
+    } catch (e) {
+      emit(NoteError('Failed to restore note'));
+    }
+  }
+
+  Future<void> emptyTrash() async {
+    emit(NoteLoading());
+    try {
+      await noteRepo.emptyTrash();
+      final updatedNotes = await noteRepo.getAllNotes(userId.toString());
+      emit(NoteSuccess(updatedNotes as List<NotesModel>));
+    } catch (e) {
+      emit(NoteError('Failed to empty trash'));
+    }
+  }
+
+  Future<void> permanentDelete(String noteId) async {
+    emit(NoteLoading());
+    try {
+      await noteRepo.permanentDelete(noteId);
+      final notes = await noteRepo.getAllNotes(userId!);
+      emit(NotePermanentDeleteSuccess('Note permanently deleted', notes as List<NotesModel>));
+    } catch (e) {
+      emit(NoteError('Failed to permanently delete note: ${e.toString()}'));
+    }
+  }
+
+  Future<void> loadDeletedNotes() async {
+    emit(NoteLoading());
+    try {
+      final Either<String, List<NotesModel>> result = await noteRepo.getAllNotes(userId.toString());
+
+      result.fold(
+            (error) => emit(NoteError(error)),
+            (notes) {
+          final deletedNotes = notes.where((n) => n.isDeleted).toList();
+          emit(DeletedNotesLoaded(deletedNotes));
+        },
+      );
+    } catch (e) {
+      emit(NoteError('Failed to load deleted notes: ${e.toString()}'));
     }
   }
 
@@ -139,6 +218,7 @@ class NoteCubit extends Cubit<NoteState> {
   void updateTitle(String newTitle) {
     emit(TitleEdit(newTitle));
   }
+
   void updateContent(String Content) {
     textChanged(Content);
     emit(ContentUpdate(Content));
@@ -172,6 +252,7 @@ class NoteCubit extends Cubit<NoteState> {
       emit(TextStyleState.inactive());
     }
   }
+
   void selectWeight(FontWeight weight) {
     if (_currentSelection != null &&
         _currentSelection!.isValid &&
@@ -187,6 +268,86 @@ class NoteCubit extends Cubit<NoteState> {
       emit(DefaultStyleUpdated(defaultWeight));
     }
   }
+
+  Future<void> updateHidden({
+    required String noteId,
+    required bool isHidden,
+  }) async {
+    emit(NoteLoading());
+    try {
+      await noteRepo.updateHidden(
+        noteId: noteId,
+        isFavorite: false,
+        isHidden: isHidden,
+      );
+      if (state is FavoritesLoaded) {
+        loadFavorites();
+      } else if (state is HiddenNotesLoaded) {
+        loadHiddenNotes();
+      } else {
+        getAllNotes();
+      }
+    } catch (e) {
+      emit(NoteError('Failed to update note status'));
+    }
+  }
+
+  Future<void> updateFavorite({
+    required String noteId,
+    required bool isFavorite,
+  }) async {
+    emit(NoteLoading());
+    try {
+      await noteRepo.updateFavorite(
+        noteId: noteId,
+        isFavorite: isFavorite,
+        isHidden: false,
+      );
+      if (state is FavoritesLoaded) {
+        loadFavorites();
+      } else if (state is HiddenNotesLoaded) {
+        loadHiddenNotes();
+      } else {
+        getAllNotes();
+      }
+    } catch (e) {
+      emit(NoteError('Failed to update note status'));
+    }
+  }
+
+  Future<void> loadFavorites() async {
+    emit(NoteLoading());
+    try {
+      final result = await noteRepo.getAllNotes(userId.toString());
+      result.fold(
+            (error) => emit(NoteError(error)),
+            (notes) {
+          final favorites = notes.where((n) => n.isFavorite).toList();
+          emit(FavoritesLoaded(favorites));
+        },
+      );
+    } catch (e) {
+      emit(NoteError('Failed to load favorites'));
+    }
+  }
+
+  Future<void> loadHiddenNotes() async {
+    emit(NoteLoading());
+    try {
+      final result = await noteRepo.getAllNotes(userId.toString());
+      result.fold(
+            (error) => emit(NoteError(error)),
+            (notes) {
+          final hiddenNotes = notes.where((n) => n.isHidden).toList();
+          emit(HiddenNotesLoaded(hiddenNotes));
+        },
+      );
+    } catch (e) {
+      emit(NoteError('Failed to load hidden notes'));
+    }
+  }
+
+
   // void selectWeight(FontWeight weight) {
   //   if (_textSelection != null && _textSelection!.isValid) {
   //     textStyles.add(TextStyleSelection(

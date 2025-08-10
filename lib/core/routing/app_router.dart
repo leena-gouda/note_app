@@ -29,7 +29,7 @@ class AppRouter {
         return _createRoute(AddNote());
       case Routes.editNoteScreen:
         final note = arguments as NotesModel;
-        return _createRoute(EditNoteScreen(note: note,));
+        return _createRoute(EditNote(note: note,));
 
       default:
         return MaterialPageRoute(

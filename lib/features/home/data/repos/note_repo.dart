@@ -15,5 +15,24 @@ abstract class NoteRepo {
 
   Future<String> deleteNote(String noteId);
 
+  Future<void> restoreNote(String noteId);
+
+  Future<void> emptyTrash();
+
+  Future<void> permanentDelete(String noteId);
+
   Future<String> editeNote(String noteId ,String title, String content);
+
+  Future<void> updateFavorite({
+    required String noteId,
+    required bool isFavorite,
+    required bool isHidden,
+  });
+
+  Future<void> updateHidden({
+    required String noteId,
+    required bool isFavorite,
+    required bool isHidden,
+  });
+
 }

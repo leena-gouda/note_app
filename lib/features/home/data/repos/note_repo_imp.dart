@@ -38,7 +38,7 @@ class NoteRepoImpl implements NoteRepo {
   Future<Either<String, List<NotesModel>>> getAllNotes(String userId) async {
     final response = await dio.get(
       EndpointConstants.getAllNotes,
-      queryParameters: {'users_id': userId},
+      queryParameters: {'users_id': userId, 'is_deleted': false},
     );
 
     if (response.data['status'] == 'success' && response.data['data'] is List) {
@@ -52,13 +52,13 @@ class NoteRepoImpl implements NoteRepo {
   @override
   Future<String> deleteNote(String noteId) async {
     final response = await dio.post(
-      EndpointConstants.deleteNote, data: {'note_id': noteId},
+      EndpointConstants.deleteNote, data: {'note_id': noteId, 'is_deleted':true, 'deleted_at': DateTime.now().toIso8601String()},
     );
 
     if (response.data['status'] == 'success') {
-      return response.data['message'] ?? 'Note deleted successfully';
+      return response.data['message'] ?? 'Note Moved to trash';
     } else {
-      throw Exception(response.data['message'] ?? 'Failed to delete note');
+      throw Exception(response.data['message'] ?? 'Failed to move note to trash');
     }
   }
 
@@ -77,4 +77,87 @@ class NoteRepoImpl implements NoteRepo {
     } else {
       throw response;
     }
-  }}
+  }
+
+  @override
+  Future<void> updateHidden({
+    required String noteId,
+    required bool isFavorite,
+    required bool isHidden,
+  }) async {
+    try {
+      // If using API
+      await dio.post(EndpointConstants.isHidden,
+          data: {
+            'note_id': noteId,
+            'is_favorite': isFavorite,
+            'is_hidden': isHidden,
+          }
+      );
+    } catch (e) {
+      throw Exception('Failed to update note status: $e');
+    }
+  }
+
+  @override
+  Future<void> updateFavorite({
+    required String noteId,
+    required bool isFavorite,
+    required bool isHidden,
+  }) async {
+    try {
+      // If using API
+      await dio.post(EndpointConstants.isFavorite,
+          data: {
+            'note_id': noteId,
+            'is_favorite': isFavorite,
+            'is_hidden': isHidden,
+          }
+      );
+    } catch (e) {
+      throw Exception('Failed to update note status: $e');
+    }
+  }
+
+  @override
+  Future<void> emptyTrash() async {
+    final response = await dio.delete(
+      EndpointConstants.emptyTrash,
+    );
+    if (response.data['status'] == 'success') {
+      return response.data['message'] ?? 'trash emptied successfully';
+    }
+    else {
+      throw response;
+    }
+
+  }
+
+  @override
+  Future<void> restoreNote(String noteId) async {
+    final response = await dio.post(EndpointConstants.restoreNote,
+        data: {
+          'note_id': noteId,
+          'is_deleted': false,
+          'deleted_at': null,
+        }
+    );
+    if (response.data['status'] == 'success') {
+      return response.data['message'] ?? 'Note restored successfully';
+    }
+    else {
+      throw response;
+    }
+  }
+
+  @override
+  Future<void> permanentDelete(String noteId) async {
+    final response = await dio.delete(
+      '${EndpointConstants.permanentDelete}/$noteId', // e.g., '/notes/permanent/$noteId'
+    );
+
+    if (response.data['status'] != 'success') {
+      throw Exception(response.data['message'] ?? 'Failed to permanently delete note');
+    }
+  }
+}

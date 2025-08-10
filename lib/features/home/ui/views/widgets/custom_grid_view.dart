@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:note_app/features/home/ui/views/favorite_screen.dart';
+import 'package:note_app/features/home/ui/views/hidden_screen.dart';
 
 import '../../../data/models/card_model.dart';
+import '../deleted_note.dart';
 import '../home_screen.dart';
 import 'custom_card.dart';
 
@@ -30,6 +33,13 @@ class CustomGridView extends StatelessWidget {
                   Navigator.push(context, MaterialPageRoute(builder: (_) => HomeScreen()));
                   break;
                 case 1:
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => FavoritesScreen()));
+                  break;
+                case 2:
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => HiddenNotesScreen()));
+                  break;
+                case 3:
+                  Navigator.push(context, MaterialPageRoute(builder: (_) => DeletedNotesScreen()));
                   break;
                 default:
                   ScaffoldMessenger.of(context).showSnackBar(

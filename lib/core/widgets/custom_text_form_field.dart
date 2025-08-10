@@ -11,6 +11,7 @@ class CustomTextFormField extends StatelessWidget {
   final TextInputAction? textInputAction;
   final FormFieldValidator<String>? validator;
   final ValueChanged<String>? onChanged;
+  final ValueChanged<String>? onSubmitted;
   final VoidCallback? onTap;
   final bool readOnly;
   final int? maxLines;
@@ -30,6 +31,7 @@ class CustomTextFormField extends StatelessWidget {
     this.textInputAction,
     this.validator,
     this.onChanged,
+    this.onSubmitted,
     this.onTap,
     this.readOnly = false,
     this.maxLines = 1,
@@ -50,6 +52,7 @@ class CustomTextFormField extends StatelessWidget {
         textInputAction: textInputAction,
         validator: validator,
         onChanged: onChanged,
+        onFieldSubmitted: onSubmitted,
         onTap: onTap,
         readOnly: readOnly,
         maxLines: maxLines,
@@ -97,3 +100,4 @@ class CustomTextFormField extends StatelessWidget {
     );
   }
 }
+

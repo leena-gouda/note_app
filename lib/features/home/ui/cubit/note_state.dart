@@ -10,8 +10,9 @@ final class AddNoteLoading extends NoteState {}
 
 final class NoteSuccess extends NoteState {
   final List<NotesModel> notes;
+  final bool isSearchResult;
 
-  NoteSuccess(this.notes);
+  NoteSuccess(this.notes,{this.isSearchResult = false});
 }
 
 final class NoteError extends NoteState {
@@ -90,4 +91,40 @@ final class NoteAddFailed extends NoteState {
   final String message;
 
   NoteAddFailed(this.message);
+}
+
+final class updateNoteStatus extends NoteState {
+  final String noteId;
+  final bool isFavorite;
+  final bool isHidden;
+
+  updateNoteStatus({
+    required this.noteId,
+    required this.isFavorite,
+    required this.isHidden,
+  });
+}
+
+final class NoteStatusUpdateFailed extends NoteState {
+  final String message;
+  NoteStatusUpdateFailed(this.message);
+}
+final class DeletedNotesLoaded extends NoteState {
+  final List<NotesModel> deletedNotes;
+  DeletedNotesLoaded(this.deletedNotes);
+}
+final class NotePermanentDeleteSuccess extends NoteState {
+  final String message;
+  final List<NotesModel> notes;
+  NotePermanentDeleteSuccess(this.message, this.notes);
+}
+
+final class FavoritesLoaded extends NoteState {
+  final List<NotesModel> favorites;
+  FavoritesLoaded(this.favorites);
+}
+
+final class HiddenNotesLoaded extends NoteState {
+  final List<NotesModel> hiddenNotes;
+  HiddenNotesLoaded(this.hiddenNotes);
 }

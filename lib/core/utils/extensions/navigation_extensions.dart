@@ -1,10 +1,17 @@
 
 //! NAVIGATION EXTENSION
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+import '../../../features/home/ui/cubit/navigation_cubit.dart';
 
 extension NavigationExtensions on BuildContext {
   // Push a new page onto the stack
   void push(Widget page) => Navigator.of(this).push(MaterialPageRoute(builder: (_) => page));
+
+  void navigateToTab(int index) {
+    read<NavigationCubit>().changeTab(index);
+  }
 
   // Push a named route onto the stack
   Future<T?> pushNamed<T>(String routeName, {Object? arguments}) =>

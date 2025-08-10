@@ -44,6 +44,7 @@ class AddNote extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Note saved successfully')),
           );
+          Navigator.pop(context);
         } else if (state is NoteAddFailed) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message)),
