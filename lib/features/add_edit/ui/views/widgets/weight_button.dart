@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../cubit/note_cubit.dart';
+import '../../cubit/add_edit_cubit.dart';
+import '../../../../home/ui/cubit/note_cubit.dart';
 
 class WeightButton extends StatelessWidget {
   final String label;
@@ -18,7 +19,7 @@ class WeightButton extends StatelessWidget {
       style: TextButton.styleFrom(
         padding: EdgeInsets.symmetric(horizontal: 12.w),
       ),
-      onPressed: () => context.read<NoteCubit>().selectWeight(weight),
+      onPressed: () => context.read<AddEditCubit>().selectWeight(weight),
       child: Text(
         label,
         style: TextStyle(

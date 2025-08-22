@@ -3,16 +3,17 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:note_app/core/utils/extensions/navigation_extensions.dart';
 import 'package:note_app/core/widgets/custom_button.dart';
-import 'package:note_app/features/home/ui/views/widgets/rich_text_editor.dart';
-import 'package:note_app/features/home/ui/views/widgets/weight_button.dart';
+import 'package:note_app/features/add_edit/ui/cubit/add_edit_cubit.dart';
+import 'package:note_app/features/add_edit/ui/views/widgets/rich_text_editor.dart';
+import 'package:note_app/features/add_edit/ui/views/widgets/weight_button.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/custom_loading_app.dart';
 import '../../../../core/widgets/custom_text_form_field.dart';
 import '../../../onboarding/ui/cubit/onboarding_cubit.dart';
 import '../../../onboarding/ui/views/widgets/custom_text_button.dart';
-import '../cubit/note_cubit.dart';
-import '../../data/models/notes_model.dart';
+import '../../../home/ui/cubit/note_cubit.dart';
+import '../../../home/data/models/notes_model.dart';
 
 class EditNote extends StatelessWidget {
   final NotesModel note;
@@ -33,7 +34,7 @@ class EditNote extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<NoteCubit, NoteState>(
+    return BlocListener<AddEditCubit, AddEditState>(
       listener: (context, state) {
         if (state is AddNoteLoading) {
           showLoadingApp(context);
@@ -51,7 +52,7 @@ class EditNote extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message)),
           );
-        } else if (state is NoteError) {
+        } else if (state is NoteAddEditError) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message)),
           );
@@ -88,7 +89,7 @@ class EditNote extends StatelessWidget {
                         ),
                       ),
                       onPressed: () async {
-                        final noteCubit = context.read<NoteCubit>();
+                        final noteCubit = context.read<AddEditCubit>();
                         // Check if either title or content is not empty
                         if (_titleController.text.trim().isNotEmpty ||
                             _contentController.text.trim().isNotEmpty) {
@@ -132,18 +133,18 @@ class EditNote extends StatelessWidget {
                       ),
                     ),
                     onChanged: (newText) =>
-                        context.read<NoteCubit>().updateTitle(newText),
+                        context.read<AddEditCubit>().updateTitle(newText),
                     onSubmitted: (_) => _contentFocusNode.requestFocus(),
                   ),
                 ),
                 Expanded(
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
-                    child: BlocBuilder<NoteCubit, NoteState>(
+                    child: BlocBuilder<AddEditCubit, AddEditState>(
                       buildWhen: (previous, current) =>
                       current is TextStyleState,
                       builder: (context, state) {
-                        final cubit = context.read<NoteCubit>();
+                        final cubit = context.read<AddEditCubit>();
                         return RichTextEditor(
                           focusNode: _contentFocusNode,
                           styles: cubit.textStyle,
@@ -191,7 +192,7 @@ class EditNote extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
       ),
       onPressed: () {
-        context.read<NoteCubit>().selectWeight(weight);
+        context.read<AddEditCubit>().selectWeight(weight);
         Navigator.pop(context);
       },
       child: Column(

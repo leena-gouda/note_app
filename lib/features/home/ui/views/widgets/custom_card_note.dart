@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:note_app/features/home/ui/views/favorite_screen.dart';
+import 'package:note_app/features/deleted/ui/cubit/deleted_cubit.dart';
+import 'package:note_app/features/favorites/ui/cubit/favorite_cubit.dart';
+import 'package:note_app/features/favorites/ui/views/favorite_screen.dart';
+import 'package:note_app/features/hidden/ui/cubit/hidden_cubit.dart';
 import '../../../../../core/theme/app_colors.dart';
 import '../../../data/models/notes_model.dart';
 import '../../cubit/note_cubit.dart';
-import '../deleted_note.dart';
-import '../hidden_screen.dart';
+import '../../../../deleted/ui/views/deleted_note.dart';
+import '../../../../hidden/ui/views/hidden_screen.dart';
 
 class CustomCardNote extends StatelessWidget {
   final NotesModel note;
@@ -31,7 +34,7 @@ class CustomCardNote extends StatelessWidget {
         if (direction == DismissDirection.startToEnd) {
           final shouldDelete = await _showDeleteConfirmation(context);
           if (shouldDelete ?? false) {
-            context.read<NoteCubit>().deleteNote(note.noteId.toString());
+            context.read<DeletedCubit>().deleteNote(note.noteId.toString());
           }
         }
       },
@@ -164,7 +167,7 @@ class CustomCardNote extends StatelessWidget {
   }
 
   void _setFavorite(BuildContext context, bool value) {
-    context.read<NoteCubit>().updateFavorite(
+    context.read<FavoriteCubit>().updateFavorite(
       noteId: note.noteId.toString(),
       isFavorite: value,
     );
@@ -172,7 +175,7 @@ class CustomCardNote extends StatelessWidget {
   }
 
   void _setHidden(BuildContext context, bool value) {
-    context.read<NoteCubit>().updateHidden(
+    context.read<HiddenCubit>().updateHidden(
       noteId: note.noteId.toString(),
       isHidden: value,
     );

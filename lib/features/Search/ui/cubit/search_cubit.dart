@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:note_app/features/home/ui/cubit/search_state.dart';
+import 'package:note_app/features/Search/ui/cubit/search_state.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SearchCubit extends Cubit<SearchState> {

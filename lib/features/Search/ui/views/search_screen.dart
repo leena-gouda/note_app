@@ -6,11 +6,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:note_app/core/theme/app_colors.dart';
 import 'package:note_app/core/widgets/custom_text_form_field.dart';
-import 'package:note_app/features/home/ui/cubit/search_cubit.dart';
+import 'package:note_app/features/Search/ui/cubit/search_cubit.dart';
 import 'package:note_app/features/home/ui/views/widgets/custom_card_note.dart';
 import 'package:note_app/features/home/ui/views/widgets/custom_header.dart';
 
-import '../cubit/note_cubit.dart';
+import '../../../home/ui/cubit/note_cubit.dart';
 import '../cubit/search_state.dart';
 
 class SearchScreen extends StatelessWidget {

@@ -93,6 +93,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:note_app/features/add_edit/data/repos/add_edit_repo_impl.dart';
+import 'package:note_app/features/add_edit/ui/cubit/add_edit_cubit.dart';
+import 'package:note_app/features/deleted/ui/cubit/deleted_cubit.dart';
+import 'package:note_app/features/favorites/data/repos/favorite_repo.dart';
+import 'package:note_app/features/favorites/data/repos/favorite_repo_impl.dart';
+import 'package:note_app/features/favorites/ui/cubit/favorite_cubit.dart';
+import 'package:note_app/features/hidden/data/repos/hidden_repo_impl.dart';
+import 'package:note_app/features/hidden/ui/cubit/hidden_cubit.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app_bloc_observer.dart';
 import 'core/routing/app_router.dart';
@@ -102,7 +110,7 @@ import 'core/utils/notification_service.dart';
 import 'features/home/data/repos/note_repo_imp.dart';
 import 'features/home/ui/cubit/navigation_cubit.dart';
 import 'features/home/ui/cubit/note_cubit.dart';
-import 'features/home/ui/cubit/search_cubit.dart';
+import 'features/Search/ui/cubit/search_cubit.dart';
 import 'firebase_options.dart';
 
 bool isLogin = false;
@@ -222,10 +230,13 @@ class MyApp extends StatelessWidget {
       builder: (context, child) => MultiBlocProvider(
         providers: [
           BlocProvider(create: (context) => NavigationCubit()),
-          BlocProvider(
-            create: (context) => NoteCubit(NoteRepoImpl())..getUserData(),
-          ),
+          BlocProvider(create: (context) => NoteCubit(NoteRepoImpl())..getUserData(),),
           BlocProvider(create: (_) => SearchCubit()),
+          BlocProvider(create: (context) => FavoriteCubit(FavoriteRepoImpl(), NoteRepoImpl())),
+          BlocProvider(create: (context) => AddEditCubit(AddEditRepoImpl())),
+          BlocProvider(create: (context) => HiddenCubit(NoteRepoImpl())),
+          BlocProvider(create: (context) => DeletedCubit(NoteRepoImpl())),
+
         ],
         child: MaterialApp(
           title: 'Your App Name',

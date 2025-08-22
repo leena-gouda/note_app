@@ -4,10 +4,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:note_app/core/utils/extensions/navigation_extensions.dart';
 import 'package:note_app/features/home/ui/cubit/navigation_cubit.dart';
-import 'package:note_app/features/home/ui/views/add_note.dart';
-import 'package:note_app/features/home/ui/views/favorite_screen.dart';
-import 'package:note_app/features/home/ui/views/hidden_screen.dart';
-import 'package:note_app/features/home/ui/views/search_screen.dart';
+import 'package:note_app/features/add_edit/ui/views/add_note.dart';
+import 'package:note_app/features/favorites/ui/views/favorite_screen.dart';
+import 'package:note_app/features/hidden/ui/views/hidden_screen.dart';
+import 'package:note_app/features/Search/ui/views/search_screen.dart';
 import 'package:note_app/features/home/ui/views/widgets/custom_card_note.dart';
 import 'package:note_app/features/home/ui/views/widgets/custom_grid_view.dart';
 import 'package:note_app/features/home/ui/views/widgets/custom_header.dart';
@@ -16,9 +16,10 @@ import 'package:note_app/features/home/ui/views/widgets/custom_recent_note.dart'
 import '../../../../core/routing/routes.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/custom_text_form_field.dart';
+import '../../../deleted/ui/cubit/deleted_cubit.dart';
 import '../../data/repos/note_repo_imp.dart';
 import '../cubit/note_cubit.dart';
-import '../cubit/search_cubit.dart';
+import '../../../Search/ui/cubit/search_cubit.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -157,7 +158,7 @@ class HomeScreen extends StatelessWidget {
               ),
               const HiddenNotesScreen(),
                SearchScreen(),
-              AddNote(),
+               AddNote(),
             ],
           ),
           // floatingActionButton: FloatingActionButton(

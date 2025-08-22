@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:note_app/core/routing/routes.dart';
 import 'package:note_app/core/utils/extensions/navigation_extensions.dart';
 import 'package:note_app/core/widgets/custom_button.dart';
-import 'package:note_app/features/home/ui/views/widgets/rich_text_editor.dart';
-import 'package:note_app/features/home/ui/views/widgets/weight_button.dart';
+import 'package:note_app/features/add_edit/ui/views/widgets/rich_text_editor.dart';
+import 'package:note_app/features/add_edit/ui/views/widgets/weight_button.dart';
 
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/widgets/custom_loading_app.dart';
 import '../../../../core/widgets/custom_text_form_field.dart';
 import '../../../onboarding/ui/cubit/onboarding_cubit.dart';
 import '../../../onboarding/ui/views/widgets/custom_text_button.dart';
-import '../cubit/note_cubit.dart';
+import '../../../home/ui/cubit/note_cubit.dart';
+import '../cubit/add_edit_cubit.dart';
 
 class AddNote extends StatelessWidget {
   final TextEditingController _titleController = TextEditingController();
@@ -30,7 +32,7 @@ class AddNote extends StatelessWidget {
   Widget build(BuildContext context) {
     debugPrint('Title: ${_titleController.text}');
     debugPrint('Content: ${_contentController.text}');
-    return BlocListener<NoteCubit, NoteState>(
+    return BlocListener<AddEditCubit, AddEditState>(
       listener: (context, state) {
         if (state is AddNoteLoading) {
           showLoadingApp(context);
@@ -45,11 +47,14 @@ class AddNote extends StatelessWidget {
             SnackBar(content: Text('Note saved successfully')),
           );
           Navigator.pop(context);
+          context.read<NoteCubit>().getAllNotes();
         } else if (state is NoteAddFailed) {
+          Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message)),
           );
-        }else if (state is NoteError) {
+        }else if (state is NoteAddEditError ) {
+          Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text(state.message)),
           );
@@ -83,13 +88,14 @@ class AddNote extends StatelessWidget {
                             borderRadius: BorderRadius.circular(10.r))
                     ),
                     onPressed: () async {
-                      final noteCubit = context.read<NoteCubit>();
+                      final noteCubit = context.read<AddEditCubit>();
                       debugPrint('Title: ${_titleController.text}');
                       debugPrint('Content: ${_contentController.text}');
                       // Check if either title or content is not empty
                       if (_titleController.text.trim().isNotEmpty ||
                           _contentController.text.trim().isNotEmpty) {
                         await noteCubit.addNote(title: _titleController.text,content: _contentController.text);
+                        Navigator.pushNamed(context, Routes.homeScreen);
                       } else {
                         // Show a message if both fields are empty
                         ScaffoldMessenger.of(context).showSnackBar(
@@ -123,17 +129,17 @@ class AddNote extends StatelessWidget {
                       )
                   ),
                   onChanged: (newText) =>
-                      context.read<NoteCubit>().updateTitle(newText),
+                      context.read<AddEditCubit>().updateTitle(newText),
                   onSubmitted: (_) => _contentFocusNode.requestFocus(),
                 ),
               ),
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
-                  child: BlocBuilder<NoteCubit, NoteState>(
+                  child: BlocBuilder<AddEditCubit, AddEditState>(
                     buildWhen: (previous, current) => current is TextStyleState,
                     builder: (context, state) {
-                      final cubit = context.read<NoteCubit>();
+                      final cubit = context.read<AddEditCubit>();
                       // _contentFocusNode.addListener(() {
                       //   if (!_contentFocusNode.hasFocus) {
                       //     context.read<NoteCubit>().textChanged("");
@@ -303,7 +309,7 @@ class AddNote extends StatelessWidget {
   }
 
   TextStyle _getTextStyle(BuildContext context) {
-    final cubit = context.read<NoteCubit>();
+    final cubit = context.read<AddEditCubit>();
     return TextStyle(
       fontWeight: cubit.defaultWeight,
       fontSize: 16.sp,
@@ -316,7 +322,7 @@ class AddNote extends StatelessWidget {
         padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
       ),
       onPressed: () {
-        context.read<NoteCubit>().selectWeight(weight);
+        context.read<AddEditCubit>().selectWeight(weight);
         Navigator.pop(context);
       },
       child: Column(

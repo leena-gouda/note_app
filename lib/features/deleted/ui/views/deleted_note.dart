@@ -2,9 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:note_app/features/deleted/ui/cubit/deleted_cubit.dart';
 import 'package:note_app/features/home/ui/views/widgets/custom_card_note.dart';
 
-import '../cubit/note_cubit.dart';
+import '../../../home/ui/cubit/note_cubit.dart';
 
 class DeletedNotesScreen extends StatelessWidget {
   const DeletedNotesScreen({super.key});
@@ -21,7 +22,7 @@ class DeletedNotesScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<NoteCubit, NoteState>(
+      body: BlocBuilder<DeletedCubit, DeletedState>(
         builder: (context, state) {
           if (state is DeletedNotesLoaded) {
             if (state.deletedNotes.isEmpty) {
@@ -45,9 +46,9 @@ class DeletedNotesScreen extends StatelessWidget {
                   },
                   onDismissed: (direction) {
                     if (direction == DismissDirection.startToEnd) {
-                      context.read<NoteCubit>().restoreNote(state.deletedNotes[index].noteId.toString());
+                      context.read<DeletedCubit>().restoreNote(state.deletedNotes[index].noteId.toString());
                     } else {
-                      context.read<NoteCubit>().permanentDelete(state.deletedNotes[index].noteId.toString());
+                      context.read<DeletedCubit>().permanentDelete(state.deletedNotes[index].noteId.toString());
                     }
                   },
                 );
@@ -185,7 +186,7 @@ class DeletedNotesScreen extends StatelessWidget {
     );
 
     if (shouldEmpty == true) {
-      context.read<NoteCubit>().emptyTrash();
+      context.read<DeletedCubit>().emptyTrash();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Trash has been emptied')),
       );
